@@ -1,0 +1,7 @@
+POST http://164.90.152.205:5000/auth/login
+content-type: application/json
+
+{
+"username":"admin",
+"password":"admin"
+}
