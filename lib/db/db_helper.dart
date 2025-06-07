@@ -1,5 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class DBHelper {
   static Database? _db;
@@ -11,35 +13,30 @@ class DBHelper {
   }
 
   static Future<Database> initDB() async {
-    final path = join(await getDatabasesPath(), 'app_data.db');
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'meu_banco.db');
 
     return await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
         await db.execute('''
-          CREATE TABLE dados (
-            id INTEGER PRIMARY KEY,
-            nome TEXT,
-            valor TEXT
+          CREATE TABLE pessoas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT
           )
         ''');
       },
     );
   }
 
-  static Future<void> insertDados(Map<String, dynamic> data) async {
+  static Future<void> inserirPessoa(String nome) async {
     final db = await database;
-    await db.insert('dados', data, conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert('pessoas', {'nome': nome});
   }
 
-  static Future<List<Map<String, dynamic>>> getDados() async {
+  static Future<List<Map<String, dynamic>>> listarPessoas() async {
     final db = await database;
-    return await db.query('dados');
-  }
-
-  static Future<void> clearTable() async {
-    final db = await database;
-    await db.delete('dados');
+    return await db.query('pessoas');
   }
 }
