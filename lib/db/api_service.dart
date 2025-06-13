@@ -9,6 +9,7 @@ class ApiService {
     final response = await http.get(
       Uri.parse(apiUrl),
       headers: {'Authorization': 'Bearer $token'},
+
     );
 
     if (response.statusCode == 200) {
