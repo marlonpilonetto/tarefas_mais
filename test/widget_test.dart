@@ -28,3 +28,28 @@ void main() {
     expect(find.text('1'), findsOneWidget);
   });
 }
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Tarefas Mais',
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Tarefas Mais'),
+        ),
+        body: const Center(
+          child: Text('0'),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+}
+
+// Your main app code here

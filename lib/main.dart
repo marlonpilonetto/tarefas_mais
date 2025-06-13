@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'db/db_helper.dart';
 
 void main() => runApp(const TarefasMaisApp());
 
@@ -35,29 +36,20 @@ class TarefasDashboard extends StatefulWidget {
 }
 
 class _TarefasDashboardState extends State<TarefasDashboard> {
-  final List<Map<String, dynamic>> tarefas = [
-    {
-      'titulo': 'Estudar Flutter',
-      'subtitulo': '2h - Alta prioridade',
-      'cor': Colors.orange,
-      'status': 'ativo',
-      'concluido': false,
-    },
-    {
-      'titulo': 'Reunião com equipe',
-      'subtitulo': '14h - Crítico',
-      'cor': Colors.red,
-      'status': 'ativo',
-      'concluido': false,
-    },
-    {
-      'titulo': 'Enviar relatório',
-      'subtitulo': 'Até 18h - Média prioridade',
-      'cor': Colors.yellow,
-      'status': 'ativo',
-      'concluido': true,
-    },
-  ];
+  List<Map<String, dynamic>> tarefas = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarTarefas();
+  }
+
+  Future<void> _carregarTarefas() async {
+    final lista = await DBHelper.listarTarefas();
+    setState(() {
+      tarefas = lista;
+    });
+  }
 
   void _abrirModalNovaTarefa() {
     String titulo = '';
@@ -130,18 +122,17 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
             ElevatedButton.icon(
               icon: const Icon(Icons.save_alt),
               label: const Text('Salvar'),
-              onPressed: () {
+              onPressed: () async {
                 if (titulo.trim().isNotEmpty) {
-                  setState(() {
-                    tarefas.add({
-                      'titulo': titulo,
-                      'subtitulo': subtitulo,
-                      'cor': corSelecionada,
-                      'status': 'ativo',
-                      'concluido': false,
-                    });
+                  await DBHelper.inserirTarefa({
+                    'titulo': titulo,
+                    'subtitulo': subtitulo,
+                    'cor': corSelecionada,
+                    'status': 'ativo',
+                    'concluido': false,
                   });
                   Navigator.of(context).pop();
+                  _carregarTarefas();
                 }
               },
             ),
@@ -151,16 +142,17 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
     );
   }
 
-  void _alternarConclusao(int index) {
-    setState(() {
-      tarefas[index]['concluido'] = !(tarefas[index]['concluido'] ?? false);
-    });
+  void _alternarConclusao(int index) async {
+    final tarefa = tarefas[index];
+    tarefa['concluido'] = !(tarefa['concluido'] ?? false);
+    await DBHelper.atualizarTarefa(tarefa['id'], tarefa);
+    _carregarTarefas();
   }
 
-  void _excluirTarefa(int index) {
-    setState(() {
-      tarefas.removeAt(index);
-    });
+  void _excluirTarefa(int index) async {
+    final tarefa = tarefas[index];
+    await DBHelper.excluirTarefa(tarefa['id']);
+    _carregarTarefas();
   }
 
   void _mostrarModalFiltrado(String tipo) {
