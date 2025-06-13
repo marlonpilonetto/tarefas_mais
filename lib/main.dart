@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'db/db_helper.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() => runApp(const TarefasMaisApp());
+void main() {
+  // Inicialização obrigatória para desktop
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
+  runApp(const TarefasMaisApp());
+}
 
 class TarefasMaisApp extends StatelessWidget {
   const TarefasMaisApp({super.key});
@@ -45,10 +51,16 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
   }
 
   Future<void> _carregarTarefas() async {
-    final lista = await DBHelper.listarTarefas();
-    setState(() {
-      tarefas = lista;
-    });
+    try {
+      final lista = await DBHelper.listarTarefas();
+      setState(() {
+        tarefas = lista;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao carregar tarefas: $e')),
+      );
+    }
   }
 
   void _abrirModalNovaTarefa() {
@@ -144,8 +156,11 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
 
   void _alternarConclusao(int index) async {
     final tarefa = tarefas[index];
-    tarefa['concluido'] = !(tarefa['concluido'] ?? false);
-    await DBHelper.atualizarTarefa(tarefa['id'], tarefa);
+    final atualizado = {
+      ...tarefa,
+      'concluido': !(tarefa['concluido'] ?? false),
+    };
+    await DBHelper.atualizarTarefa(tarefa['id'], atualizado);
     _carregarTarefas();
   }
 
@@ -275,7 +290,11 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                           vertical: 12,
                         ),
                         leading: CircleAvatar(
-                          backgroundColor: tarefa['cor'],
+                          backgroundColor: Color(
+                            tarefa['cor'] is int
+                                ? tarefa['cor']
+                                : Colors.grey.value,
+                          ),
                           radius: 10,
                         ),
                         title: Text(

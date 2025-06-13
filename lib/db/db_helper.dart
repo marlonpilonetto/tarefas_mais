@@ -93,3 +93,4 @@ class DBHelper {
     await db.delete('tarefas', where: 'id = ?', whereArgs: [id]);
   }
 }
+
