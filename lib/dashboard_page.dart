@@ -11,6 +11,9 @@ class TarefasDashboard extends StatefulWidget {
 class _TarefasDashboardState extends State<TarefasDashboard> {
   List<Map<String, dynamic>> tarefas = [];
 
+  final TextEditingController _searchController = TextEditingController();
+  String? _statusSelecionado;
+
   @override
   void initState() {
     super.initState();
@@ -19,8 +22,28 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
 
   Future<void> _carregarTarefas() async {
     final lista = await DBHelper.listarTarefas();
+    final textoBusca = _searchController.text.toLowerCase();
+
+    final filtrada = lista.where((tarefa) {
+      final titulo = (tarefa['titulo'] ?? '').toLowerCase();
+      final subtitulo = (tarefa['subtitulo'] ?? '').toLowerCase();
+      final status = (tarefa['status'] ?? '').toLowerCase();
+
+      final correspondeBusca =
+          textoBusca.isEmpty ||
+          titulo.contains(textoBusca) ||
+          subtitulo.contains(textoBusca);
+
+      final correspondeStatus =
+          _statusSelecionado == null ||
+          _statusSelecionado == 'todos' ||
+          status == _statusSelecionado;
+
+      return correspondeBusca && correspondeStatus;
+    }).toList();
+
     setState(() {
-      tarefas = lista;
+      tarefas = filtrada;
     });
   }
 
@@ -50,7 +73,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
               const SizedBox(height: 12),
               TextField(
                 decoration: const InputDecoration(
-                  labelText: 'Descrição / Prioridade',
+                  labelText: 'Descrição',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) => subtitulo = value,
@@ -146,73 +169,130 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: tarefas.isEmpty
-            ? const Center(child: Text('Nenhuma tarefa cadastrada.'))
-            : ListView.builder(
-                itemCount: tarefas.length,
-                itemBuilder: (context, index) {
-                  final tarefa = tarefas[index];
-                  final bool concluido = tarefa['concluido'] ?? false;
-
-                  return Opacity(
-                    opacity: concluido ? 0.5 : 1.0,
-                    child: Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        leading: CircleAvatar(
-                          backgroundColor: tarefa['cor'] is Color
-                              ? tarefa['cor']
-                              : Colors.grey,
-                          radius: 10,
-                        ),
-                        title: Text(
-                          tarefa['titulo'],
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(tarefa['subtitulo'] ?? ''),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Status: ${tarefa['status']}',
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ),
-                        trailing: Wrap(
-                          spacing: 8,
-                          children: [
-                            IconButton(
-                              tooltip: 'Marcar como concluída',
-                              icon: Icon(
-                                concluido
-                                    ? Icons.check_circle
-                                    : Icons.radio_button_unchecked,
-                                color: concluido ? Colors.green : Colors.grey,
-                              ),
-                              onPressed: () => _alternarConclusao(index),
-                            ),
-                            IconButton(
-                              tooltip: 'Excluir tarefa',
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _excluirTarefa(index),
-                            ),
-                          ],
-                        ),
-                      ),
+        child: Column(
+          children: [
+            // Filtros
+            Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (_) => _carregarTarefas(),
+                    decoration: const InputDecoration(
+                      labelText: 'Buscar tarefa',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
                     ),
-                  );
-                },
-              ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: DropdownButtonFormField<String>(
+                    value: _statusSelecionado,
+                    decoration: const InputDecoration(
+                      labelText: 'Status',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'todos', child: Text('Todos')),
+                      DropdownMenuItem(value: 'ativo', child: Text('Ativo')),
+                      DropdownMenuItem(
+                        value: 'inativo',
+                        child: Text('Inativo'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _statusSelecionado = value;
+                      });
+                      _carregarTarefas();
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            // Lista
+            Expanded(
+              child: tarefas.isEmpty
+                  ? const Center(child: Text('Nenhuma tarefa encontrada.'))
+                  : ListView.builder(
+                      itemCount: tarefas.length,
+                      itemBuilder: (context, index) {
+                        final tarefa = tarefas[index];
+                        final bool concluido = tarefa['concluido'] ?? false;
+
+                        return Opacity(
+                          opacity: concluido ? 0.5 : 1.0,
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              leading: CircleAvatar(
+                                backgroundColor: tarefa['cor'] is Color
+                                    ? tarefa['cor']
+                                    : Colors.grey,
+                                radius: 10,
+                              ),
+                              title: Text(
+                                tarefa['titulo'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(tarefa['subtitulo'] ?? ''),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Status: ${tarefa['status']}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                              trailing: Wrap(
+                                spacing: 8,
+                                children: [
+                                  IconButton(
+                                    tooltip: 'Marcar como concluída',
+                                    icon: Icon(
+                                      concluido
+                                          ? Icons.check_circle
+                                          : Icons.radio_button_unchecked,
+                                      color: concluido
+                                          ? Colors.green
+                                          : Colors.grey,
+                                    ),
+                                    onPressed: () => _alternarConclusao(index),
+                                  ),
+                                  IconButton(
+                                    tooltip: 'Excluir tarefa',
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () => _excluirTarefa(index),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'add_tarefa',
