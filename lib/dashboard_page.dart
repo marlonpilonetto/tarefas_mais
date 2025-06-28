@@ -227,6 +227,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // Filtros
             Row(
               children: [
                 Expanded(
@@ -269,6 +270,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
               ],
             ),
             const SizedBox(height: 20),
+            // Lista
             Expanded(
               child: tarefas.isEmpty
                   ? const Center(child: Text('Nenhuma tarefa encontrada.'))
@@ -327,8 +329,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                           ? Colors.green
                                           : Colors.grey,
                                     ),
-                                    onPressed: () =>
-                                        _alternarConclusao(index),
+                                    onPressed: () => _alternarConclusao(index),
                                   ),
                                   IconButton(
                                     tooltip: 'Excluir tarefa',
