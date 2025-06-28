@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tarefas_mais/db/api_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,11 +19,14 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _fazerLogin() {
+  void _fazerLogin() async  {
     final String usuario = _usuarioController.text.trim();
     final String senha = _senhaController.text.trim();
+    final token = await ApiService.login(usuario, senha);
+    
 
-    if (usuario == 'admin' && senha == 'admin') {
+    if (token != '') {
+      //salva o token no banco
       Navigator.of(context).pushReplacementNamed('/dashboard');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -140,7 +144,9 @@ class _LoginPageState extends State<LoginPage> {
                             elevation: 8,
                             shadowColor: Colors.blue[900],
                           ),
-                          onPressed: _fazerLogin,
+                          onPressed: () {
+                            _fazerLogin();
+                          }
                         ),
                       ),
                     ],

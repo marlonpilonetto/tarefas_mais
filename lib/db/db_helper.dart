@@ -34,16 +34,17 @@ class DBHelper {
         await db.execute('''
           CREATE TABLE pessoas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT
+            nome TEXT,
+            token TEXT
           )
         ''');
       },
     );
   }
 
-  static Future<void> inserirPessoa(String nome) async {
+  static Future<void> inserirPessoa(String token) async {
     final db = await database;
-    await db.insert('pessoas', {'nome': nome});
+    await db.insert('pessoas', {'token': token});
   }
 
   static Future<List<Map<String, dynamic>>> listarPessoas() async {

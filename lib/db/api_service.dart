@@ -1,37 +1,81 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String apiUrl = 'http://164.90.152.205:5000/auth/login';
-  static const String token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiJhMTM2NWNiNy1hMDllLTQxZDMtYTc0OS0zOTQ0OWY1YWU3ZTgiLCJ1c2VySWQiOiI3YmI3ZmRmMS0yMjU5LTQ0NWQtOGZjNC0xNmYyZDcyYzgyY2YiLCJ1c2VybmFtZSI6ImFkbWluIiwidHVpIjoiNDI4Y2FmZTYtYmM3NC00ZGE4LThmMDYtNDM5MDg2NjU3ZjFkIiwiaWF0IjoxNzQ5MjUzMjU3fQ.N_6n7TW7G2G93MhR4EBP-wMobjKWkziXEXOIFZvDN4I';
+  static const String apiUrl = 'http://164.90.152.205:5000';
+  static const String endpointLogin = '/auth/login';
+  static const String endpointTarefas = '/tarefas';
 
-  static Future<List<Map<String, dynamic>>> fetchDados() async {
+  /// Faz login, salva token localmente e retorna o token
+  static Future<String> login(String usuario, String senha) async {
+    final response = await http.post(
+      Uri.parse('$apiUrl$endpointLogin'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'username': usuario,
+        'password': senha,
+      }),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data['token'] != null) {
+      final token = data['token'];
+
+      // Salvar token localmente
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', token);
+
+      return token;
+    } else {
+      throw Exception('Erro no login: ${response.body}');
+    }
+  }
+
+  /// Recupera o token salvo localmente
+  static Future<String?> getTokenSalvo() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
+  /// Busca dados usando o token salvo
+  static Future<List<Map<String, dynamic>>> buscarTarefas() async {
+    final token = await getTokenSalvo();
+    if (token == null) throw Exception('Token não encontrado. Faça login.');
+
     final response = await http.get(
-      Uri.parse(apiUrl),
-      headers: {'Authorization': 'Bearer $token'},
-
+      Uri.parse('$apiUrl$endpointTarefas'),
+      headers: {
+        'Content-Type': 'application/json',
+        'access-token': token,
+      },
     );
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
       return data.cast<Map<String, dynamic>>();
     } else {
-      throw Exception('Erro ao buscar dados');
+      throw Exception('Erro ao buscar dados: ${response.body}');
     }
   }
 
-  static Future<void> enviarDado(Map<String, dynamic> dado) async {
+  /// Envia tarefa usando o token salvo
+  static Future<void> criarTarefa(Map<String, dynamic> dado) async {
+    final token = await getTokenSalvo();
+    if (token == null) throw Exception('Token não encontrado. Faça login.');
+
     final response = await http.post(
-      Uri.parse(apiUrl),
+      Uri.parse('$apiUrl$endpointTarefas'),
       headers: {
-        'Authorization': 'Bearer $token',
+        'access-token': token,
         'Content-Type': 'application/json',
       },
       body: jsonEncode(dado),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Erro ao enviar dado');
+      throw Exception('Erro ao enviar tarefa: ${response.body}');
     }
   }
 }
