@@ -74,7 +74,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
               const SizedBox(height: 12),
               TextField(
                 decoration: const InputDecoration(
-                  labelText: 'Descrição',
+                  labelText: 'Prioridade',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) => subtitulo = value,
@@ -152,6 +152,8 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
       ...tarefa,
       'concluido': !(tarefa['concluido'] ?? false),
     };
+   
+   //Criar função de concluir tarefa direto pela api
     await DBHelper.atualizarTarefa(tarefa['id'], atualizado);
     _carregarTarefas();
   }
@@ -173,16 +175,16 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
       }
 
       final lista = await ApiService.buscarTarefas();
-
+      final List<Map<String, dynamic>> lista2 = [];
       for (var tarefa in lista) {
         final dado = {
           'titulo': tarefa['titulo'],
           'subtitulo': tarefa['subtitulo'],
           'status': tarefa['status'],
-          'cor': Color(tarefa['cor']).value,
+          'cor': Color(tarefa['cor']),
           'concluido': tarefa['concluido'],
         };
-
+        lista2.add(dado);
         try {
           // await ApiService.criarTarefa(dado);
         } catch (e) {
@@ -194,7 +196,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
         const SnackBar(content: Text('Tarefas sincronizadas com sucesso.')),
       );
       setState(() {
-          tarefas = lista;
+          tarefas = lista2;
         },);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
