@@ -78,4 +78,41 @@ class ApiService {
       throw Exception('Erro ao enviar tarefa: ${response.body}');
     }
   }
+
+  /// Atualiza uma tarefa usando o token salvo
+  static Future<void> atualizarTarefa(dynamic id, Map<String, dynamic> dado) async {
+    final token = await getTokenSalvo();
+    if (token == null) throw Exception('Token não encontrado. Faça login.');
+
+    final response = await http.patch(
+      Uri.parse('$apiUrl$endpointTarefas/$id'),
+      headers: {
+        'access-token': token,
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(dado),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Erro ao atualizar tarefa: ${response.body}');
+    }
+  }
+
+  /// Exclui uma tarefa usando o token salvo
+  static Future<void> excluirTarefa(dynamic id) async {
+    final token = await getTokenSalvo();
+    if (token == null) throw Exception('Token não encontrado. Faça login.');
+
+    final response = await http.delete(
+      Uri.parse('$apiUrl$endpointTarefas/$id'),
+      headers: {
+        'access-token': token,
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception('Erro ao excluir tarefa: ${response.body}');
+    }
+  }
 }
