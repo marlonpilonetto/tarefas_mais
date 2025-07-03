@@ -13,6 +13,10 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
   final TextEditingController _searchController = TextEditingController();
   String? _statusSelecionado;
 
+  static const corFundo = Color(0xFF2563EB); // Azul de fundo
+  static const corContainer = Color(0xFFF3F4F6); // Cinza claro
+  static const corTexto = Color(0xFF1F2937); // Cinza escuro
+
   @override
   void initState() {
     super.initState();
@@ -56,99 +60,154 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'Adicionar Tarefa',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
-                    color: Color(0xFF1565C0),
+          child: Center(
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: 400, // Tamanho fixo igual ao container da dashboard
+              ),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: corContainer,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                const SizedBox(height: 18),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Título',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) => titulo = value,
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Descrição',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) => subtitulo = value,
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: corSelecionada,
-                  decoration: const InputDecoration(
-                    labelText: 'Prioridade',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: const [
-                    DropdownMenuItem(value: "#D32F2F", child: Text('Crítico', style: TextStyle(color: Color(0xFFD32F2F)))),
-                    DropdownMenuItem(value: "#FFA000", child: Text('Alta', style: TextStyle(color: Color(0xFFFFA000)))),
-                    DropdownMenuItem(value: "#FFEB3B", child: Text('Média', style: TextStyle(color: Color(0xFFFFEB3B)))),
-                    DropdownMenuItem(value: "#388E3C", child: Text('Baixa', style: TextStyle(color: Color(0xFF388E3C)))),
-                    DropdownMenuItem(value: "#9E9E9E", child: Text('Sem prioridade', style: TextStyle(color: Color(0xFF9E9E9E)))),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) corSelecionada = value;
-                  },
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      child: const Text('Cancelar'),
-                      onPressed: () => Navigator.of(context).pop(),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Nova Tarefa',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: corTexto,
                     ),
-                    const SizedBox(width: 8),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.save_alt),
-                      label: const Text('Salvar'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1565C0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 18),
+                  TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Título',
+                      labelStyle: TextStyle(color: corTexto, fontWeight: FontWeight.bold),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
                       ),
-                      onPressed: () async {
-                        if (titulo.trim().isNotEmpty) {
-                          await ApiService.criarTarefa({
-                            'titulo': titulo,
-                            'subtitulo': subtitulo,
-                            'cor': corSelecionada,
-                            'status': 'ativo',
-                            'concluido': false,
-                          });
-                          Navigator.of(context).pop();
-                          await _carregarTarefas();
-                        }
-                      },
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                     ),
-                  ],
-                ),
-              ],
+                    style: const TextStyle(color: corTexto),
+                    onChanged: (value) => titulo = value,
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    decoration: const InputDecoration(
+                      labelText: 'Descrição',
+                      labelStyle: TextStyle(color: corTexto, fontWeight: FontWeight.bold),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                    ),
+                    style: const TextStyle(color: corTexto),
+                    onChanged: (value) => subtitulo = value,
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: corSelecionada,
+                    decoration: const InputDecoration(
+                      labelText: 'Prioridade',
+                      labelStyle: TextStyle(color: corTexto, fontWeight: FontWeight.bold),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: Colors.black, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: "#D32F2F", child: Text('Crítico', style: TextStyle(color: Color(0xFFD32F2F)))),
+                      DropdownMenuItem(value: "#FFA000", child: Text('Alta', style: TextStyle(color: Color(0xFFFFA000)))),
+                      DropdownMenuItem(value: "#FFEB3B", child: Text('Média', style: TextStyle(color: Color(0xFFFFEB3B)))),
+                      DropdownMenuItem(value: "#388E3C", child: Text('Baixa', style: TextStyle(color: Color(0xFF388E3C)))),
+                      DropdownMenuItem(value: "#9E9E9E", child: Text('Sem prioridade', style: TextStyle(color: Color(0xFF9E9E9E)))),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) corSelecionada = value;
+                    },
+                    style: const TextStyle(color: corTexto),
+                    iconEnabledColor: corTexto,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        child: const Text('Cancelar', style: TextStyle(color: corTexto)),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.save_alt, color: Colors.white),
+                        label: const Text('Salvar', style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF10B981), // Verde
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () async {
+                          if (titulo.trim().isNotEmpty) {
+                            await ApiService.criarTarefa({
+                              'titulo': titulo,
+                              'subtitulo': subtitulo,
+                              'cor': corSelecionada,
+                              'status': 'ativo',
+                              'concluido': false,
+                            });
+                            Navigator.of(context).pop();
+                            await _carregarTarefas();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -192,102 +251,102 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 2,
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Color(0xFF1565C0)),
-            const SizedBox(width: 8),
-            const Text(
-              'Tarefas+',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-                color: Colors.black, // <-- preto
-                letterSpacing: 1.2,
-              ),
+      backgroundColor: corFundo,
+      body: SafeArea(
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.black12, width: 1.5),
+              color: corContainer,
             ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFF1565C0)),
-            tooltip: 'Atualizar',
-            onPressed: _carregarTarefas,
-          ),
-        ],
-      ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 700),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            margin: const EdgeInsets.all(12),
             child: Column(
               children: [
-                // Barra de busca e filtro
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: (_) => _carregarTarefas(),
-                        decoration: InputDecoration(
-                          labelText: 'Buscar tarefa',
-                          labelStyle: const TextStyle(color: Colors.black),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          prefixIcon: const Icon(Icons.search, color: Colors.black),
-                          filled: true,
-                          fillColor: const Color.fromARGB(255, 255, 255, 255),
-                        ),
-                        style: const TextStyle(color: Colors.black),
+                // AppBar customizada
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        'lib/imagens/logo.png',
+                        height: 36,
+                        fit: BoxFit.contain,
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: DropdownButtonFormField<String>(
-                        value: _statusSelecionado,
-                        decoration: InputDecoration(
-                          labelText: 'Status',
-                          labelStyle: const TextStyle(color: Colors.black),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          filled: true,
-                          fillColor: const Color.fromARGB(255, 255, 255, 255),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'todos',
-                            child: Text('Todos', style: TextStyle(color: Colors.black)),
-                          ),
-                          DropdownMenuItem(
-                            value: 'ativo',
-                            child: Text('Ativo', style: TextStyle(color: Colors.black)),
-                          ),
-                          DropdownMenuItem(
-                            value: 'inativo',
-                            child: Text('Inativo', style: TextStyle(color: Colors.black)),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            _statusSelecionado = value;
-                          });
-                          _carregarTarefas();
-                        },
-                        style: const TextStyle(color: Colors.black),
-                        iconEnabledColor: Colors.black,
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.refresh, color: corTexto, size: 26),
+                        tooltip: 'Atualizar',
+                        onPressed: _carregarTarefas,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
+                // Busca
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (_) => _carregarTarefas(),
+                    decoration: InputDecoration(
+                      labelText: 'Buscar tarefa',
+                      labelStyle: const TextStyle(color: corTexto),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      prefixIcon: const Icon(Icons.search, color: corTexto),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                    ),
+                    style: const TextStyle(color: corTexto),
+                  ),
+                ),
+                // Filtro de status
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: DropdownButtonFormField<String>(
+                    value: _statusSelecionado,
+                    decoration: InputDecoration(
+                      labelText: 'Status',
+                      labelStyle: const TextStyle(
+                        color: corTexto,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'todos',
+                        child: Text('-', style: TextStyle(color: corTexto)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'ativo',
+                        child: Text('Ativo', style: TextStyle(color: corTexto)),
+                      ),
+                      DropdownMenuItem(
+                        value: 'inativo',
+                        child: Text('Inativo', style: TextStyle(color: corTexto)),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _statusSelecionado = value;
+                      });
+                      _carregarTarefas();
+                    },
+                    style: const TextStyle(color: corTexto),
+                    iconEnabledColor: corTexto,
+                  ),
+                ),
+                const SizedBox(height: 8),
                 // Lista de tarefas
                 Expanded(
                   child: tarefas.isEmpty
@@ -295,119 +354,98 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                           child: Text(
                             'Nenhuma tarefa encontrada.',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: corTexto,
                               fontSize: 18,
                             ),
                           ),
                         )
                       : ListView.separated(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           itemCount: tarefas.length,
                           separatorBuilder: (_, __) => const SizedBox(height: 10),
                           itemBuilder: (context, index) {
                             final tarefa = tarefas[index];
                             final bool concluido = tarefa['concluido'] ?? false;
 
-                            return Card(
-                              elevation: 6,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.black12, width: 1),
                               ),
-                              color: Colors.white,
                               child: ListTile(
                                 contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 18,
-                                  vertical: 12,
+                                  horizontal: 12,
+                                  vertical: 4,
                                 ),
                                 leading: CircleAvatar(
                                   backgroundColor: _parseColor(tarefa['cor']),
-                                  radius: 16,
+                                  radius: 18,
                                   child: Icon(
-                                    concluido ? Icons.check : Icons.assignment_turned_in,
+                                    concluido ? Icons.check : Icons.circle_outlined,
                                     color: Colors.white,
-                                    size: 18,
+                                    size: 22,
                                   ),
                                 ),
                                 title: Text(
                                   tarefa['titulo'],
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 17,
-                                    color: Colors.black, // <-- preto
-                                    decoration: concluido
-                                        ? TextDecoration.lineThrough
-                                        : null,
+                                    fontSize: 16,
+                                    color: corTexto,
                                   ),
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      tarefa['subtitulo'] ?? '',
-                                      style: const TextStyle(
-                                        color: Colors.black, // <-- preto
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      'Status: ${tarefa['status']}',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.black, // <-- preto
-                                      ),
-                                    ),
-                                  ],
+                                subtitle: Text(
+                                  'Status: ${tarefa['status']}',
+                                  style: const TextStyle(
+                                    color: corTexto,
+                                    fontSize: 13,
+                                  ),
                                 ),
-                                trailing: Wrap(
-                                  spacing: 4,
-                                  children: [
-                                    IconButton(
-                                      tooltip: concluido
-                                          ? 'Desmarcar conclusão'
-                                          : 'Marcar como concluída',
-                                      icon: Icon(
-                                        concluido
-                                            ? Icons.check_circle
-                                            : Icons.radio_button_unchecked,
-                                        color: concluido
-                                            ? Colors.green
-                                            : Colors.blue[800],
-                                        size: 22,
-                                      ),
-                                      onPressed: () => _alternarConclusao(index),
-                                    ),
-                                    IconButton(
-                                      tooltip: 'Excluir tarefa',
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                        size: 22,
-                                      ),
-                                      onPressed: () => _excluirTarefa(index),
-                                    ),
-                                  ],
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.radio_button_unchecked, color: corTexto, size: 28),
+                                  onPressed: () => _alternarConclusao(index),
+                                  tooltip: concluido
+                                      ? 'Desmarcar conclusão'
+                                      : 'Marcar como concluída',
                                 ),
+                                onLongPress: () => _excluirTarefa(index),
                               ),
                             );
                           },
                         ),
                 ),
+                // Botão Nova Tarefa
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      label: const Text(
+                        'Nova Tarefa',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide.none,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        backgroundColor: const Color(0xFF10B981), // Verde
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                      ),
+                      onPressed: _abrirModalNovaTarefa,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'add_tarefa',
-        backgroundColor: const Color(0xFF1565C0),
-        onPressed: _abrirModalNovaTarefa,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'Nova Tarefa',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Colors.white,
           ),
         ),
       ),
