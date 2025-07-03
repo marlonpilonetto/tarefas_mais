@@ -13,9 +13,24 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
   final TextEditingController _searchController = TextEditingController();
   String? _statusSelecionado;
 
-  static const corFundo = Color(0xFF2563EB); // Azul de fundo
-  static const corContainer = Color(0xFFF3F4F6); // Cinza claro
-  static const corTexto = Color(0xFF1F2937); // Cinza escuro
+  // Controle do modo escuro
+  bool _darkMode = false;
+
+  // Cores claras
+  static const corFundo = Color(0xFF2563EB);
+  static const corContainer = Color(0xFFF3F4F6);
+  static const corTexto = Color(0xFF1F2937);
+
+  // Cores escuras
+  static const corFundoDark = Color(0xFF181C2A);
+  static const corContainerDark = Color(0xFF23263A);
+  static const corTextoDark = Color(0xFFF3F4F6);
+
+  Color get _bgColor => _darkMode ? corFundoDark : corFundo;
+  Color get _containerColor => _darkMode ? corContainerDark : corContainer;
+  Color get _textColor => _darkMode ? corTextoDark : corTexto;
+  Color get _inputFillColor => _darkMode ? const Color(0xFF23263A) : Colors.white;
+  Color get _inputBorderColor => _darkMode ? corTextoDark : Colors.black;
 
   @override
   void initState() {
@@ -63,11 +78,11 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
           child: Center(
             child: Container(
               constraints: const BoxConstraints(
-                maxWidth: 400, // Tamanho fixo igual ao container da dashboard
+                maxWidth: 400,
               ),
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: corContainer,
+                color: _containerColor,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -80,84 +95,84 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Nova Tarefa',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 24,
-                      color: corTexto,
+                      color: _textColor,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 18),
                   TextField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Título',
-                      labelStyle: TextStyle(color: corTexto, fontWeight: FontWeight.bold),
+                      labelStyle: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 1.5),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 1.5),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 2),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 2),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                      fillColor: _inputFillColor,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                     ),
-                    style: const TextStyle(color: corTexto),
+                    style: TextStyle(color: _textColor),
                     onChanged: (value) => titulo = value,
                   ),
                   const SizedBox(height: 12),
                   TextField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Descrição',
-                      labelStyle: TextStyle(color: corTexto, fontWeight: FontWeight.bold),
+                      labelStyle: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 1.5),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 1.5),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 2),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 2),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                      fillColor: _inputFillColor,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                     ),
-                    style: const TextStyle(color: corTexto),
+                    style: TextStyle(color: _textColor),
                     onChanged: (value) => subtitulo = value,
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: corSelecionada,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Prioridade',
-                      labelStyle: TextStyle(color: corTexto, fontWeight: FontWeight.bold),
+                      labelStyle: TextStyle(color: _textColor, fontWeight: FontWeight.bold),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 1.5),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 1.5),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 1.5),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(14)),
-                        borderSide: BorderSide(color: Colors.black, width: 2),
+                        borderRadius: const BorderRadius.all(Radius.circular(14)),
+                        borderSide: BorderSide(color: _inputBorderColor, width: 2),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                      fillColor: _inputFillColor,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                     ),
                     items: const [
                       DropdownMenuItem(value: "#D32F2F", child: Text('Crítico', style: TextStyle(color: Color(0xFFD32F2F)))),
@@ -169,15 +184,15 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                     onChanged: (value) {
                       if (value != null) corSelecionada = value;
                     },
-                    style: const TextStyle(color: corTexto),
-                    iconEnabledColor: corTexto,
+                    style: TextStyle(color: _textColor),
+                    iconEnabledColor: _textColor,
                   ),
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        child: const Text('Cancelar', style: TextStyle(color: corTexto)),
+                        child: Text('Cancelar', style: TextStyle(color: _textColor)),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                       const SizedBox(width: 8),
@@ -185,7 +200,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                         icon: const Icon(Icons.save_alt, color: Colors.white),
                         label: const Text('Salvar', style: TextStyle(color: Colors.white)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981), // Verde
+                          backgroundColor: const Color(0xFF10B981),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -251,7 +266,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: corFundo,
+      backgroundColor: _bgColor,
       body: SafeArea(
         child: Center(
           child: Container(
@@ -259,7 +274,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               border: Border.all(color: Colors.black12, width: 1.5),
-              color: corContainer,
+              color: _containerColor,
             ),
             margin: const EdgeInsets.all(12),
             child: Column(
@@ -270,15 +285,33 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                   child: Row(
                     children: [
                       Image.asset(
-                        'lib/imagens/logo.png',
+                        _darkMode ? 'lib/imagens/logo_dark.png' : 'lib/imagens/logo.png',
                         height: 36,
                         fit: BoxFit.contain,
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(Icons.refresh, color: corTexto, size: 26),
+                        icon: Icon(
+                          Icons.refresh,
+                          color: _darkMode ? Colors.white : corTexto,
+                          size: 26,
+                        ),
                         tooltip: 'Atualizar',
                         onPressed: _carregarTarefas,
+                      ),
+                      // Botão de dark mode
+                      IconButton(
+                        icon: Icon(
+                          _darkMode ? Icons.dark_mode : Icons.light_mode,
+                          color: _darkMode ? corTextoDark : corTexto,
+                          size: 26,
+                        ),
+                        tooltip: _darkMode ? 'Modo claro' : 'Modo escuro',
+                        onPressed: () {
+                          setState(() {
+                            _darkMode = !_darkMode;
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -291,16 +324,16 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                     onChanged: (_) => _carregarTarefas(),
                     decoration: InputDecoration(
                       labelText: 'Buscar tarefa',
-                      labelStyle: const TextStyle(color: corTexto),
+                      labelStyle: TextStyle(color: _textColor),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
-                      prefixIcon: const Icon(Icons.search, color: corTexto),
+                      prefixIcon: Icon(Icons.search, color: _textColor),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: _inputFillColor,
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                     ),
-                    style: const TextStyle(color: corTexto),
+                    style: TextStyle(color: _textColor),
                   ),
                 ),
                 // Filtro de status
@@ -310,8 +343,8 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                     value: _statusSelecionado,
                     decoration: InputDecoration(
                       labelText: 'Status',
-                      labelStyle: const TextStyle(
-                        color: corTexto,
+                      labelStyle: TextStyle(
+                        color: _textColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
@@ -319,7 +352,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: _inputFillColor,
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
                     ),
                     items: const [
@@ -342,19 +375,19 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                       });
                       _carregarTarefas();
                     },
-                    style: const TextStyle(color: corTexto),
-                    iconEnabledColor: corTexto,
+                    style: TextStyle(color: _textColor),
+                    iconEnabledColor: _textColor,
                   ),
                 ),
                 const SizedBox(height: 8),
                 // Lista de tarefas
                 Expanded(
                   child: tarefas.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             'Nenhuma tarefa encontrada.',
                             style: TextStyle(
-                              color: corTexto,
+                              color: _textColor,
                               fontSize: 18,
                             ),
                           ),
@@ -369,7 +402,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
 
                             return Container(
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: _inputFillColor,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(color: Colors.black12, width: 1),
                               ),
@@ -389,16 +422,16 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                 ),
                                 title: Text(
                                   tarefa['titulo'],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
-                                    color: corTexto,
+                                    color: _textColor,
                                   ),
                                 ),
                                 subtitle: Text(
                                   'Status: ${tarefa['status']}',
-                                  style: const TextStyle(
-                                    color: corTexto,
+                                  style: TextStyle(
+                                    color: _textColor,
                                     fontSize: 13,
                                   ),
                                 ),
@@ -406,7 +439,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     IconButton(
-                                      icon: const Icon(Icons.radio_button_unchecked, color: corTexto, size: 28),
+                                      icon: Icon(Icons.radio_button_unchecked, color: _textColor, size: 28),
                                       onPressed: () => _alternarConclusao(index),
                                       tooltip: concluido
                                           ? 'Desmarcar conclusão'
@@ -419,11 +452,12 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                         final confirm = await showDialog<bool>(
                                           context: context,
                                           builder: (context) => AlertDialog(
-                                            title: const Text('Excluir tarefa'),
-                                            content: const Text('Tem certeza que deseja excluir esta tarefa?'),
+                                            backgroundColor: _containerColor,
+                                            title: Text('Excluir tarefa', style: TextStyle(color: _textColor)),
+                                            content: Text('Tem certeza que deseja excluir esta tarefa?', style: TextStyle(color: _textColor)),
                                             actions: [
                                               TextButton(
-                                                child: const Text('Cancelar'),
+                                                child: Text('Cancelar', style: TextStyle(color: _textColor)),
                                                 onPressed: () => Navigator.of(context).pop(false),
                                               ),
                                               ElevatedButton(
@@ -455,7 +489,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                             constraints: const BoxConstraints(maxWidth: 400),
                                             padding: const EdgeInsets.all(24),
                                             decoration: BoxDecoration(
-                                              color: corContainer,
+                                              color: _containerColor,
                                               borderRadius: BorderRadius.circular(24),
                                               boxShadow: [
                                                 BoxShadow(
@@ -469,53 +503,53 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                               mainAxisSize: MainAxisSize.min,
                                               crossAxisAlignment: CrossAxisAlignment.stretch,
                                               children: [
-                                                const Text(
+                                                Text(
                                                   'Detalhes da Tarefa',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 22,
-                                                    color: corTexto,
+                                                    color: _textColor,
                                                   ),
                                                   textAlign: TextAlign.center,
                                                 ),
                                                 const SizedBox(height: 18),
                                                 Text(
                                                   'Título',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    color: corTexto,
+                                                    color: _textColor,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
                                                   tarefa['titulo'] ?? '',
-                                                  style: const TextStyle(
-                                                    color: corTexto,
+                                                  style: TextStyle(
+                                                    color: _textColor,
                                                     fontSize: 16,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 16),
                                                 Text(
                                                   'Descrição',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    color: corTexto,
+                                                    color: _textColor,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
                                                   tarefa['subtitulo'] ?? '',
-                                                  style: const TextStyle(
-                                                    color: corTexto,
+                                                  style: TextStyle(
+                                                    color: _textColor,
                                                     fontSize: 16,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 16),
                                                 Text(
                                                   'Prioridade',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    color: corTexto,
+                                                    color: _textColor,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
@@ -539,7 +573,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                                 Align(
                                                   alignment: Alignment.centerRight,
                                                   child: TextButton(
-                                                    child: const Text('Fechar', style: TextStyle(color: corTexto)),
+                                                    child: Text('Fechar', style: TextStyle(color: _textColor)),
                                                     onPressed: () => Navigator.of(context).pop(),
                                                   ),
                                                 ),
@@ -577,7 +611,7 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        backgroundColor: const Color(0xFF10B981), // Verde
+                        backgroundColor: const Color(0xFF10B981),
                         foregroundColor: Colors.white,
                         elevation: 0,
                       ),
