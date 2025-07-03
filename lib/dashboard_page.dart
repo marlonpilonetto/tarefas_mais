@@ -402,14 +402,155 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
                                     fontSize: 13,
                                   ),
                                 ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.radio_button_unchecked, color: corTexto, size: 28),
-                                  onPressed: () => _alternarConclusao(index),
-                                  tooltip: concluido
-                                      ? 'Desmarcar conclusão'
-                                      : 'Marcar como concluída',
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.radio_button_unchecked, color: corTexto, size: 28),
+                                      onPressed: () => _alternarConclusao(index),
+                                      tooltip: concluido
+                                          ? 'Desmarcar conclusão'
+                                          : 'Marcar como concluída',
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 26),
+                                      tooltip: 'Excluir tarefa',
+                                      onPressed: () async {
+                                        final confirm = await showDialog<bool>(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: const Text('Excluir tarefa'),
+                                            content: const Text('Tem certeza que deseja excluir esta tarefa?'),
+                                            actions: [
+                                              TextButton(
+                                                child: const Text('Cancelar'),
+                                                onPressed: () => Navigator.of(context).pop(false),
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  foregroundColor: Colors.white,
+                                                ),
+                                                child: const Text('Excluir'),
+                                                onPressed: () => Navigator.of(context).pop(true),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        if (confirm == true) {
+                                          _excluirTarefa(index);
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
-                                onLongPress: () => _excluirTarefa(index),
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        child: Center(
+                                          child: Container(
+                                            constraints: const BoxConstraints(maxWidth: 400),
+                                            padding: const EdgeInsets.all(24),
+                                            decoration: BoxDecoration(
+                                              color: corContainer,
+                                              borderRadius: BorderRadius.circular(24),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.08),
+                                                  blurRadius: 16,
+                                                  offset: const Offset(0, 4),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                                              children: [
+                                                const Text(
+                                                  'Detalhes da Tarefa',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 22,
+                                                    color: corTexto,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                                const SizedBox(height: 18),
+                                                Text(
+                                                  'Título',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: corTexto,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  tarefa['titulo'] ?? '',
+                                                  style: const TextStyle(
+                                                    color: corTexto,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16),
+                                                Text(
+                                                  'Descrição',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: corTexto,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  tarefa['subtitulo'] ?? '',
+                                                  style: const TextStyle(
+                                                    color: corTexto,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 16),
+                                                Text(
+                                                  'Prioridade',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: corTexto,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      backgroundColor: _parseColor(tarefa['cor']),
+                                                      radius: 10,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      _prioridadeTexto(tarefa['cor']?.toString()),
+                                                      style: TextStyle(
+                                                        color: _parseColor(tarefa['cor']),
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 24),
+                                                Align(
+                                                  alignment: Alignment.centerRight,
+                                                  child: TextButton(
+                                                    child: const Text('Fechar', style: TextStyle(color: corTexto)),
+                                                    onPressed: () => Navigator.of(context).pop(),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
                               ),
                             );
                           },
@@ -450,6 +591,24 @@ class _TarefasDashboardState extends State<TarefasDashboard> {
         ),
       ),
     );
+  }
+
+  String _prioridadeTexto(dynamic cor) {
+    final corStr = cor?.toString();
+    switch (corStr) {
+      case "#D32F2F":
+        return "Crítico";
+      case "#FFA000":
+        return "Alta";
+      case "#FFEB3B":
+        return "Média";
+      case "#388E3C":
+        return "Baixa";
+      case "#9E9E9E":
+        return "Sem prioridade";
+      default:
+        return "Desconhecida";
+    }
   }
 }
 
